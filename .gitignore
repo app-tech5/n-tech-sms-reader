@@ -1,0 +1,30 @@
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.ap_
+*.aab
+
+# Keystore
+*.jks
+*.keystore
+
+# Android Studio
+.navigation/
+*.hprof
+
+# Gradle (généré en CI si besoin)
+.gradle/
+gradlew
+gradlew.bat
+gradle/wrapper/gradle-wrapper.jar
+
+# Build output
+app/build/
+build/

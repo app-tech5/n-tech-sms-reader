@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">N-TECH SMS</string>
+    <string name="app_title">N-TECH SMS Reader</string>
+    <string name="status_listening">Écoute SMS active (arrière-plan)</string>
+    <string name="status_permission_required">Autorisation SMS requise</string>
+    <string name="permission_message">L\'app a besoin d\'accéder aux SMS pour les enregistrer automatiquement, même quand elle est fermée.</string>
+    <string name="grant_permission">Autoriser les SMS</string>
+    <string name="refresh">Actualiser</string>
+    <string name="empty_list">Aucun SMS enregistré. Envoyez un SMS test au numéro de ce téléphone.</string>
+    <string name="sms_count">%1$d SMS enregistré(s)</string>
+</resources>
