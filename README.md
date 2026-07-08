@@ -2,60 +2,68 @@
 
 Mini-app Android : réception SMS en **arrière-plan**, affichage brut (expéditeur + texte + date).
 
-## Livrable M1.1
+## Lien client (téléchargement direct APK)
 
-- APK `ntech-sms-reader-v0.1.apk`
-- Réception SMS même app fermée
-- Liste locale des SMS reçus (tous expéditeurs, pas de filtre Orange/MTN)
+```
+https://prospect.fromcm.com/ntech/downloads/ntech-sms-reader.apk
+```
 
-## Build (GitHub Actions — pas de build local)
+Le client ouvre ce lien sur son téléphone Android → téléchargement → installation.
 
-1. Pousser le code sur GitHub
-2. Aller dans **Actions** → workflow **Build APK** → **Run workflow** (ou push sur `main`)
-3. À la fin du job, télécharger l’artifact **`ntech-sms-reader-v0.1`**
+---
 
-L’APK s’appelle : `ntech-sms-reader-v0.1.apk`
+## Setup VPS (une seule fois)
 
-### Release (optionnel)
-
-Créer un tag `v0.1.0` → l’APK est aussi attaché à la GitHub Release :
+### 1. Dossier sur le serveur
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+sudo mkdir -p /var/www/ntech/downloads
+sudo chown $USER:www-data /var/www/ntech/downloads
 ```
+
+### 2. Nginx
+
+Ajouter le contenu de `deploy/nginx-downloads.conf` dans la config nginx de `prospect.fromcm.com`, puis :
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### 3. Secrets GitHub (repo n-tech-sms-reader)
+
+| Secret | Exemple |
+|--------|---------|
+| `VPS_HOST` | `prospect.fromcm.com` |
+| `VPS_USER` | `deploy` |
+| `VPS_SSH_KEY` | clé privée SSH |
+| `VPS_PORT` | `22` |
+| `VPS_APK_DIR` | `/var/www/ntech/downloads/` |
+
+À chaque push sur `main`, la CI build l'APK et l'envoie sur le VPS. Le lien client reste le même.
+
+---
 
 ## Installation sur le téléphone marchand
 
-1. Copier l'APK sur le téléphone
+1. Ouvrir le lien ci-dessus sur le téléphone
 2. Autoriser « sources inconnues » si demandé
 3. Installer
 4. À l'ouverture : **Autoriser les SMS**
-5. Paramètres téléphone → Batterie → désactiver l'optimisation pour **N-TECH SMS** (recommandé)
+5. Batterie → désactiver l'optimisation pour **N-TECH SMS**
 
 ## Test client M1.1
 
 | # | Action | Résultat attendu |
 |---|--------|------------------|
-| 1 | Installer l'app, **ne pas l'ouvrir** (ou la fermer) | — |
-| 2 | Depuis un autre téléphone, envoyer un SMS texte au numéro marchand | — |
+| 1 | Installer l'app, **ne pas l'ouvrir** | — |
+| 2 | Envoyer un SMS test au numéro marchand | — |
 | 3 | Attendre 30 s, ouvrir l'app | SMS visible : expéditeur, texte, date/heure |
 | 4 | Envoyer un 2e SMS | Les 2 apparaissent dans la liste |
 
 **Validé si :** les 2 SMS sont corrects, captés sans avoir gardé l'app ouverte.
 
-## Structure
-
-```
-app/src/main/java/com/ntech/smsreader/
-  MainActivity.kt      # Liste + permissions
-  SmsReceiver.kt       # Réception background
-  SmsDatabaseHelper.kt # Stockage local SQLite
-  SmsRecord.kt         # Modèle
-```
-
 ## Hors périmètre M1.1
 
-- Filtre Orange / MTN (M1.2 / M1.3)
-- Parsing montant (M1.4)
+- Filtre Orange / MTN
+- Parsing montant
 - Envoi au backend

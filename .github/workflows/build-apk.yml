@@ -5,11 +5,10 @@ on:
     branches:
       - main
       - master
-  pull_request:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,22 +41,15 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace --no-daemon
 
-      - name: Rename APK
-        run: |
-          cp app/build/outputs/apk/debug/app-debug.apk \
-            app/build/outputs/apk/debug/ntech-sms-reader-v0.1.apk
+      - name: Prepare APK (nom fixe pour le lien client)
+        run: cp app/build/outputs/apk/debug/app-debug.apk ntech-sms-reader.apk
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - name: Deploy APK to VPS
+        uses: appleboy/scp-action@v0.1.7
         with:
-          name: ntech-sms-reader-v0.1
-          path: app/build/outputs/apk/debug/ntech-sms-reader-v0.1.apk
-          retention-days: 90
-
-      - name: Upload APK on GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: app/build/outputs/apk/debug/ntech-sms-reader-v0.1.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: ntech-sms-reader.apk
+          target: ${{ secrets.VPS_APK_DIR }}
